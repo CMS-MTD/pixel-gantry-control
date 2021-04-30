@@ -1,0 +1,49 @@
+COPY $sensor_one_pos {330.140815,225.967374,83.247463}
+COPY $sensor_two_pos {378.624096,225.796211,83.283625}
+COPY $baseplate_one_pos {27.486993,254.316561,93.235788}
+
+LOADTOOL picker_tool
+
+COPY $pickup_pos $sensor_one_pos
+CALL @PICKUP 
+
+ADD $place_pos $baseplate_one_pos {0,-12.65,0}
+CALL @PLACE
+
+COPY $pickup_pos $sensor_two_pos
+CALL @PICKUP
+
+ADD $place_pos $baseplate_one_pos {0,12.65,0}
+CALL @PLACE
+
+UNLOADTOOL
+
+END
+
+@PICKUP PASS
+    FLEXREAD $pickup_tho geometry.tool_holder_offset
+    FLEXREAD $pickup_co geometry.PICKER_TOOL.center_offset
+    SUB $pickup_pos $pickup_pos $pickup_tho
+    SUB $pickup_pos $pickup_pos $pickup_co
+    print %v $pickup_pos
+    MOVETO $pickup_pos 20
+    MOVEREL {0,0,1.22} 1
+    WAIT 2000
+    SETVAC gantry_head_inner 1
+    WAIT 2000
+    MOVEREL {0,0,-10} 4
+    GOTO $RET
+
+@PLACE PASS
+    FLEXREAD $place_tho geometry.tool_holder_offset
+    FLEXREAD $place_co geometry.PICKER_TOOL.center_offset
+    SUB $place_pos $place_pos $place_tho
+    SUB $place_pos $place_pos $place_co
+    print %v $place_pos
+    MOVETO $place_pos 20
+    MOVEREL {0,0,1.18} 1
+    WAIT 2000
+    SETVAC gantry_head_inner 0
+    WAIT 2000
+    MOVEREL {0,0,-10} 4
+    GOTO $RET
