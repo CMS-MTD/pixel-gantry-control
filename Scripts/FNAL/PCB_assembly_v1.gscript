@@ -1,5 +1,6 @@
 HOME
 SETVAC chuck_0 1
+SETVAC chuck_1 1
 
 COPY $LO_SPEED 20
 COPY $HI_SPEED 40
@@ -42,6 +43,7 @@ CALL @PLACE
 UNLOADTOOL
 
 setvac chuck_0 0
+SETVAC chuck_1 0
 
 END
 
@@ -70,15 +72,24 @@ COPY $baseplate_bl $baseplate_fid
 FIT $baseplate_pos $baseplate_rot ETL_Baseplate_PCB_Mockup $baseplate_tr $baseplate_br $baseplate_bl $baseplate_tl
 GOTO $BREAK
 
-@BASEPLATE_FID_FINDER PASS
+@BASEPLATE_FID_FINDER COPY $BREAKOUT $RET
     VIDEO
     AUTOFOCUS $z 1 autoclose
     SETLIGHT 40
     SETERRORMODE setvar
-    @RETRY FINDFID $baseplate_fid ETL_Baseplate_PCB_Mockup
-    GOTOIF @RETRY $ERR
+    COPY $RETRIES 3
+    @RETRY_BASEPLATE DEC $RETRIES $RETRIES
+    GOTOIFN @MANUAL_FID_BP $RETRIES
+    FINDFID $baseplate_fid ETL_Baseplate_PCB_Mockup
+    GOTOIF @RETRY_BASEPLATE $ERR
     SETERRORMODE normal
-    GOTO $RET
+    GOTO $BREAKOUT
+    @MANUAL_FID_BP CHOICEPOPUP $c "Unable to locate fiducial, use camera feed and mpg to manually center the gantry on the fiducial" "continue" "continue"
+    MPGON
+    VIDEO
+    GETPOS $baseplate_fid
+    MPGOFF
+    GOTO $BREAKOUT
 
 @CALC_SENSOR_CENTER_ROT COPY $BREAK $RET
 FLEXREAD $fid_dx geometry.ETL_Sensor_PCB_Mockup.fid_dx
@@ -104,16 +115,24 @@ COPY $Sensor_bl $Sensor_fid
 FIT $sensor_pos $sensor_rot ETL_Sensor_PCB_Mockup $Sensor_tr $Sensor_br $Sensor_bl $Sensor_tl
 GOTO $BREAK
 
-@SENSOR_FID_FINDER PASS
+@SENSOR_FID_FINDER COPY $BREAKOUT $RET
     VIDEO
     AUTOFOCUS $z 1 autoclose
     SETLIGHT 10
     SETERRORMODE setvar
-    @RETRY FINDFID $Sensor_fid ETL_Sensor_PCB_Mockup
-    GOTOIF @RETRY $ERR
+    COPY $RETRIES 3
+    @RETRY_SENSOR DEC $RETRIES $RETRIES
+    GOTOIFN @MANUAL_FID_SENS $RETRIES
+    FINDFID $Sensor_fid ETL_Sensor_PCB_Mockup 
+    GOTOIF @RETRY_SENSOR $ERR
     SETERRORMODE normal
-    GOTO $RET
-
+    GOTO $BREAKOUT
+    @MANUAL_FID_SENS CHOICEPOPUP $c "Unable to locate fiducial, use camera feed and mpg to manually center the gantry on the fiducial" "continue" "continue"
+    MPGON
+    VIDEO
+    GETPOS $Sensor_fid
+    MPGOFF
+    GOTO $BREAKOUT
 
 @PICKUP PASS
     FLEXREAD $pickup_tho geometry.tool_holder_offset
