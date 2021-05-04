@@ -13,7 +13,7 @@ COPY $baseplate_one_rot $baseplate_rot
 
 PRINT %v $baseplate_one_pos
 
-MOVENAME ETL_baseplate_chuck_0_slot_1 $LO_SPEED
+MOVENAME ETL_baseplate_chuck_0_slot_1 $HI_SPEED
 CALL @CALC_BASEPLATE_CENTER_ROT
 COPY $baseplate_two_pos $baseplate_pos
 COPY $baseplate_two_rot $baseplate_rot
@@ -27,7 +27,7 @@ COPY $sensor_one_rot $sensor_rot
 
 PRINT %v $sensor_one_pos
 
-MOVENAME ETL_sensor_chuck_0_slot_1 $LO_SPEED
+MOVENAME ETL_sensor_chuck_0_slot_1 $HI_SPEED
 CALL @CALC_SENSOR_CENTER_ROT
 COPY $sensor_two_pos $sensor_pos
 COPY $sensor_two_rot $sensor_rot
@@ -39,35 +39,51 @@ CALL @CALC_SENSOR_CENTER_ROT
 COPY $sensor_three_pos $sensor_pos
 COPY $sensor_three_rot $sensor_rot
 
+PRINT %v $sensor_three_pos
+
 MOVENAME ETL_sensor_chuck_0_slot_3 $HI_SPEED
 CALL @CALC_SENSOR_CENTER_ROT
 COPY $sensor_four_pos $sensor_pos
 COPY $sensor_four_rot $sensor_rot
 
+PRINT %v $sensor_four_pos
+
 LOADTOOL picker_tool
 
+# top sensor first module
+COPY $place_pos $baseplate_one_pos
+COPY $place_rot $baseplate_one_rot
 COPY $pickup_pos $sensor_one_pos
 CALL @PICKUP 
-
-ADD $place_pos $baseplate_one_pos {0,-12.65,0}
+COPY $offset -12.65
+COPY $pickup_rot $sensor_one_rot
 CALL @PLACE
 
+# bottom sensor first module
+COPY $place_pos $baseplate_one_pos
+COPY $place_rot $baseplate_one_rot
 COPY $pickup_pos $sensor_two_pos
 CALL @PICKUP
-
-ADD $place_pos $baseplate_one_pos {0,12.65,0}
+COPY $offset 12.65
+COPY $pickup_rot $sensor_two_rot
 CALL @PLACE
 
+# top sensor second module
+COPY $place_pos $baseplate_two_pos
+COPY $place_rot $baseplate_two_rot
 COPY $pickup_pos $sensor_three_pos
 CALL @PICKUP 
-
-ADD $place_pos $baseplate_two_pos {0,-12.65,0}
+COPY $offset -12.65
+COPY $pickup_rot $sensor_three_rot
 CALL @PLACE
 
+# bottom sensor second module
+COPY $place_pos $baseplate_two_pos
+COPY $place_rot $baseplate_two_rot
 COPY $pickup_pos $sensor_four_pos
 CALL @PICKUP
-
-ADD $place_pos $baseplate_two_pos {0,12.65,0}
+COPY $offset 12.65
+COPY $pickup_rot $sensor_four_rot
 CALL @PLACE
 
 UNLOADTOOL
@@ -172,10 +188,10 @@ GOTO $BREAK
     print %v $pickup_pos
     MOVETO $pickup_pos 20
     MOVEREL {0,0,1.22} 1
-    WAIT 2000
+    WAIT 1000
     SETVAC gantry_head_inner 1
     WAIT 2000
-    MOVEREL {0,0,-10} 4
+    MOVEREL {0,0,-20} 10
     GOTO $RET
 
 @PLACE PASS
@@ -184,10 +200,26 @@ GOTO $BREAK
     SUB $place_pos $place_pos $place_tho
     SUB $place_pos $place_pos $place_co
     print %v $place_pos
+    QUAT2EULER $pickup_yaw $p $r $pickup_rot
+    ROTATE $pickup_yaw 5
+    INVERT $place_rot $place_rot
+    QUAT2EULER $place_yaw $p $r $place_rot
+    ROTATE $place_yaw 5
+
+    COS $cos_place $place_yaw
+    SIN $sin_place $place_yaw
+
+    MUL $dx_place $offset $sin_place
+    MUL $dy_place $offset $cos_place
+
+    ADD $place_pos.x $place_pos.x $dx_place
+    ADD $place_pos.y $place_pos.y $dy_place
+
     MOVETO $place_pos 20
     MOVEREL {0,0,1.18} 1
     WAIT 2000
     SETVAC gantry_head_inner 0
     WAIT 2000
-    MOVEREL {0,0,-10} 4
+    MOVEREL {0,0,-20} 10
+    ROTATETO 0 5
     GOTO $RET
