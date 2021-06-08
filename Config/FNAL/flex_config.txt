@@ -92,7 +92,7 @@ geometry.PICKER_TOOL.center_offset: {0,0,53.75}  # Height of picker tool
 # The offset between the camera and the
 # center-of-rotation of the gantry head in x-y
 # and the bottom surface of the tool-holder in z
-geometry.tool_holder_offset: {0.16,-69.32,-16.34}
+geometry.tool_holder_offset: {0.16,-70.80,-16.34}
 
 #================================================
 #====== Vision/Pattern Recognition parameters
@@ -100,8 +100,8 @@ geometry.tool_holder_offset: {0.16,-69.32,-16.34}
 
 vision.debug_enable: False
 vision.log_directory: C:\Users\Public\Documents\pixel-gantry-control\Logs
-vision.autofocus.step_size: 0.05 # mm
-vision.autofocus.delay: 150 # ms
+vision.autofocus.step_size: 0.1 # mm
+vision.autofocus.delay: 25 # ms
 
 vision.FPIX_HDI.method: find_patches
 vision.FPIX_HDI.shrinkFactor: 4
