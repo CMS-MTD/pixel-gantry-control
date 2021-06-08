@@ -55,7 +55,7 @@ COPY $place_pos $baseplate_one_pos
 COPY $place_rot $baseplate_one_rot
 COPY $pickup_pos $sensor_one_pos
 CALL @PICKUP 
-COPY $offset -12.65
+COPY $offset -11.775
 COPY $pickup_rot $sensor_one_rot
 CALL @PLACE
 
@@ -64,7 +64,7 @@ COPY $place_pos $baseplate_one_pos
 COPY $place_rot $baseplate_one_rot
 COPY $pickup_pos $sensor_two_pos
 CALL @PICKUP
-COPY $offset 12.65
+COPY $offset 11.775
 COPY $pickup_rot $sensor_two_rot
 CALL @PLACE
 
@@ -73,7 +73,7 @@ COPY $place_pos $baseplate_two_pos
 COPY $place_rot $baseplate_two_rot
 COPY $pickup_pos $sensor_three_pos
 CALL @PICKUP 
-COPY $offset -12.65
+COPY $offset -11.775
 COPY $pickup_rot $sensor_three_rot
 CALL @PLACE
 
@@ -82,7 +82,7 @@ COPY $place_pos $baseplate_two_pos
 COPY $place_rot $baseplate_two_rot
 COPY $pickup_pos $sensor_four_pos
 CALL @PICKUP
-COPY $offset 12.65
+COPY $offset 11.775
 COPY $pickup_rot $sensor_four_rot
 CALL @PLACE
 
@@ -119,8 +119,8 @@ FIT $baseplate_pos $baseplate_rot ETL_Baseplate_PCB_Mockup $baseplate_tr $basepl
 GOTO $BREAK
 
 @BASEPLATE_FID_FINDER COPY $BREAKOUT $RET
-    VIDEO
-    AUTOFOCUS $z 1 autoclose
+    # VIDEO
+    AUTOFOCUS $z 0.5 autoclose
     SETLIGHT 40
     SETERRORMODE setvar
     COPY $RETRIES 3
@@ -162,8 +162,8 @@ FIT $sensor_pos $sensor_rot ETL_Sensor_PCB_Mockup $Sensor_tr $Sensor_br $Sensor_
 GOTO $BREAK
 
 @SENSOR_FID_FINDER COPY $BREAKOUT $RET
-    VIDEO
-    AUTOFOCUS $z 1 autoclose
+    # VIDEO
+    AUTOFOCUS $z 0.5 autoclose
     SETLIGHT 10
     SETERRORMODE setvar
     COPY $RETRIES 3
@@ -210,6 +210,7 @@ GOTO $BREAK
     SIN $sin_place $place_yaw
 
     MUL $dx_place $offset $sin_place
+    MUL $dx_place $dx_place -1
     MUL $dy_place $offset $cos_place
 
     ADD $place_pos.x $place_pos.x $dx_place
